@@ -20,7 +20,7 @@ body {
 }
 
 .privacy-policy {
-  h2 {
+  h3 {
     margin-top: 1rem;
     margin-bottom: 0.5rem;
   }
@@ -29,13 +29,11 @@ body {
 h1,
 h2,
 h3 {
-  font-family: "Newsreader", serif;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 h3 {
-  font-style: italic;
-  font-weight: 400;
+  font-size: 1rem;
 }
 
 .logo {
@@ -72,4 +70,8 @@ footer {
 footer > div {
   display: flex;
   gap: 0.5rem;
+}
+
+footer a {
+  text-decoration: none;
 }
