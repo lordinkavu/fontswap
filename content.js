@@ -1,10 +1,4 @@
-let originalStyles = null;
-
 function applyFont(font) {
-  if (!originalStyles) {
-    originalStyles = document.body.style.cssText;
-  }
-
   const link = document.createElement("link");
   link.href = `https://fonts.googleapis.com/css?family=${font.replace(
     " ",
@@ -34,11 +28,6 @@ function applyFont(font) {
 }
 
 function resetFont() {
-  if (originalStyles !== null) {
-    document.body.style.cssText = originalStyles;
-    originalStyles = null;
-  }
-
   // Remove added stylesheet and style elements
   document
     .querySelectorAll("link[data-font-link], style[data-font-style]")
