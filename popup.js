@@ -3,32 +3,41 @@ document.addEventListener("DOMContentLoaded", function () {
   const applyButton = document.getElementById("applyFont");
   const resetButton = document.getElementById("resetFont");
 
-  // Load previously selected font
-  chrome.storage.sync.get("selectedFont", function (data) {
-    if (data.selectedFont) {
-      fontSelect.value = data.selectedFont;
-    }
-  });
+  chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+    const currentTab = tabs[0];
+    const currentDomain = new URL(currentTab.url).hostname;
 
-  applyButton.addEventListener("click", function () {
-    const selectedFont = fontSelect.value;
-    if (selectedFont) {
-      chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-        chrome.tabs.sendMessage(tabs[0].id, {
-          action: "changeFont",
-          font: selectedFont,
-        });
-      });
-      chrome.storage.sync.set({ selectedFont: selectedFont });
-    }
-  });
-
-  resetButton.addEventListener("click", function () {
-    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-      chrome.tabs.sendMessage(tabs[0].id, { action: "resetFont" });
+    // Load previously selected font
+    chrome.storage.sync.get(`selectedFont_${currentDomain}`, function (data) {
+      const selectedFont = data[`selectedFont_${currentDomain}`];
+      if (selectedFont) {
+        fontSelect.value = selectedFont;
+      }
     });
-    chrome.storage.sync.remove("selectedFont");
-    fontSelect.value = "";
+
+    applyButton.addEventListener("click", function () {
+      const selectedFont = fontSelect.value;
+      if (selectedFont) {
+        try {
+          chrome.tabs.sendMessage(currentTab.id, {
+            action: "changeFont",
+            font: selectedFont,
+          });
+        } catch (error) {
+          console.error("Error sending message to content script:", error);
+        }
+
+        chrome.storage.sync.set({
+          [`selectedFont_${currentDomain}`]: selectedFont,
+        });
+      }
+    });
+
+    resetButton.addEventListener("click", function () {
+      chrome.tabs.sendMessage(currentTab.id, { action: "resetFont" });
+      chrome.storage.sync.remove(`selectedFont_${currentDomain}`);
+      fontSelect.value = "";
+    });
   });
 
   fonts.forEach((font) => {
